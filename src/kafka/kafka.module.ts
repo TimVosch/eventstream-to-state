@@ -1,4 +1,4 @@
-import { Module } from '@nestjs/common';
+import { Module, OnModuleDestroy, Inject } from '@nestjs/common';
 import { Kafka } from 'kafkajs';
 
 @Module({
