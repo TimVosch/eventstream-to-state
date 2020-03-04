@@ -1,27 +1,36 @@
-import { Injectable, Inject, BeforeApplicationShutdown } from '@nestjs/common';
-import { Kafka, Consumer, Producer, EachMessagePayload } from 'kafkajs';
+import {
+  Injectable,
+  Inject,
+  BeforeApplicationShutdown,
+  Logger,
+} from '@nestjs/common';
+import { Kafka, Consumer, EachMessagePayload } from 'kafkajs';
 import { v4 as uuid } from 'uuid';
-import { UserCreatedEvent } from './events/userCreated.event';
-import { User } from './entities/user.entity';
+import { UserCreatedEvent } from '../events/userCreated.event';
+import { User } from '../entities/user.entity';
+import { BaseEvent } from 'src/events/base.event';
 
 @Injectable()
-export class UserSource implements BeforeApplicationShutdown {
+export class UserQuery implements BeforeApplicationShutdown {
+  /**
+   * A mapping between event types and their processing functions
+   */
+  private readonly EVENT_FUNC_MAP = {
+    CREATE_USER: this.evCreateUser.bind(this),
+  };
+
   private readonly TOPIC = 'userEvents';
   private readonly consumer: Consumer;
-  private readonly producer: Producer;
 
   constructor(@Inject('KAFKA') kafka: Kafka) {
     this.consumer = kafka.consumer({
       groupId: uuid(),
     });
     this.consumer.connect().then(this.startConsumer.bind(this));
-    this.producer = kafka.producer();
-    this.producer.connect();
   }
 
   beforeApplicationShutdown() {
     this.consumer.disconnect();
-    this.producer.disconnect();
   }
 
   /**
@@ -51,23 +60,18 @@ export class UserSource implements BeforeApplicationShutdown {
    */
   private processMessage(payload: EachMessagePayload): void {
     const { message } = payload;
-    console.log(`Received message ${message.value}`);
+    const ev = JSON.parse(message.value.toString()) as BaseEvent;
+    Logger.log(`Processing EV: ${ev.type}`);
+
+    const processor = this.EVENT_FUNC_MAP[ev.type];
+    if (!processor) {
+      Logger.error(`No processor found for EV: ${ev.type}`);
+      return;
+    }
+    processor(ev);
   }
 
-  /**
-   *
-   */
-  async create(user: User): Promise<UserCreatedEvent> {
-    // Commit to event log
-    const event = new UserCreatedEvent(user);
-    await this.producer.send({
-      topic: this.TOPIC,
-      messages: [
-        {
-          value: JSON.stringify(event),
-        },
-      ],
-    });
-    return event;
+  private evCreateUser(ev: UserCreatedEvent): void {
+    Logger.log('Creating user...');
   }
 }
