@@ -1,4 +1,4 @@
-import { Injectable } from '@nestjs/common';
+import { Injectable, NotFoundException } from '@nestjs/common';
 import { User } from './entities/user.entity';
 import { v4 as uuid } from 'uuid';
 import { CreateUserDTO } from './dto/createUser.dto';
@@ -24,6 +24,11 @@ export class UserService {
   }
 
   async deleteUser(userId: string): Promise<BaseEvent> {
+    // User must exist
+    if (this.getUser(userId) === null) {
+      throw new NotFoundException();
+    }
+
     return this.command.delete(userId);
   }
 
@@ -41,6 +46,11 @@ export class UserService {
    * @param amount The mutation amount
    */
   async mutateCredit(userId: string, amount: number): Promise<BaseEvent> {
+    // User must exist
+    if (this.getUser(userId) === null) {
+      throw new NotFoundException();
+    }
+
     return this.command.mutateCredit(userId, amount);
   }
 }

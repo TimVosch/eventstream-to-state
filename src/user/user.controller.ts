@@ -33,15 +33,13 @@ export class UserController {
   }
 
   @Post('/:id/credit')
-  async mutateCredit(@Param('id') id: string, @Body() body: any) {
-    const user = await this.getUser(id);
-
+  async mutateCredit(@Param('id') userId: string, @Body() body: any) {
     // Mutation must be numeric
     if (typeof body.amount !== 'number') {
       return new BadRequestException();
     }
 
-    return this.service.mutateCredit(user.id, body.amount);
+    return this.service.mutateCredit(userId, body.amount);
   }
 
   @Delete('/:id')
