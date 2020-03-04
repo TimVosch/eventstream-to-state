@@ -6,7 +6,7 @@ import {
 } from '@nestjs/common';
 import { Kafka, Consumer, EachMessagePayload } from 'kafkajs';
 import { v4 as uuid } from 'uuid';
-import { UserCreatedEvent } from '../events/userCreated.event';
+import { CreateUserEvent } from '../events/userCreated.event';
 import { User } from '../entities/user.entity';
 import { BaseEvent } from 'src/events/base.event';
 
@@ -71,7 +71,7 @@ export class UserQuery implements BeforeApplicationShutdown {
     processor(ev);
   }
 
-  private evCreateUser(ev: UserCreatedEvent): void {
+  private evCreateUser(ev: CreateUserEvent): void {
     Logger.log('Creating user...');
   }
 }

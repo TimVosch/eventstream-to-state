@@ -1,11 +1,11 @@
 import { Injectable, Inject, BeforeApplicationShutdown } from '@nestjs/common';
 import { Kafka, Producer } from 'kafkajs';
-import { UserCreatedEvent } from '../events/userCreated.event';
+import { CreateUserEvent } from '../events/userCreated.event';
 import { User } from '../entities/user.entity';
 
 @Injectable()
 export class UserCommand implements BeforeApplicationShutdown {
-  private readonly TOPIC = 'userEvents';
+  private readonly TOPIC = 'USER_EVENTS';
   private readonly producer: Producer;
 
   constructor(@Inject('KAFKA') kafka: Kafka) {
@@ -20,9 +20,9 @@ export class UserCommand implements BeforeApplicationShutdown {
   /**
    *
    */
-  async create(user: User): Promise<UserCreatedEvent> {
+  async create(user: User): Promise<CreateUserEvent> {
     // Commit to event log
-    const event = new UserCreatedEvent(user);
+    const event = new CreateUserEvent(user);
     await this.producer.send({
       topic: this.TOPIC,
       messages: [
