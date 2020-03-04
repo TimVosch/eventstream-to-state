@@ -45,7 +45,7 @@ export class UserController {
   }
 
   @Delete('/:id')
-  deleteUser(): User {
-    throw new NotImplementedException();
+  deleteUser(@Param('id') userId: string) {
+    return this.service.deleteUser(userId);
   }
 }

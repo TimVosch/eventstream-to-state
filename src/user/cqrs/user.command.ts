@@ -9,6 +9,7 @@ import { CreateUserEvent } from '../events/createUser.event';
 import { User } from '../entities/user.entity';
 import { BaseEvent } from 'src/events/base.event';
 import { MutateUserCreditEvent } from '../events/mutateUserCredit.event';
+import { DeleteUserEvent } from '../events/deleteUser.event';
 
 @Injectable()
 export class UserCommand implements BeforeApplicationShutdown {
@@ -42,6 +43,16 @@ export class UserCommand implements BeforeApplicationShutdown {
   async create(user: User): Promise<CreateUserEvent> {
     // Commit to event log
     const event = new CreateUserEvent(user);
+    await this.sendEvent(event);
+    return event;
+  }
+
+  /**
+   * Delete a user
+   * @param userId The user to delete
+   */
+  async delete(userId: string): Promise<DeleteUserEvent> {
+    const event = new DeleteUserEvent(userId);
     await this.sendEvent(event);
     return event;
   }

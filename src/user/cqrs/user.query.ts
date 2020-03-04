@@ -12,6 +12,7 @@ import { User } from '../entities/user.entity';
 import { BaseEvent } from 'src/events/base.event';
 import { UserMemory } from './user.memory';
 import { MutateUserCreditEvent } from '../events/mutateUserCredit.event';
+import { DeleteUserEvent } from '../events/deleteUser.event';
 
 @Injectable()
 export class UserQuery implements BeforeApplicationShutdown {
@@ -20,6 +21,7 @@ export class UserQuery implements BeforeApplicationShutdown {
    */
   private readonly EVENT_FUNC_MAP = {
     CREATE_USER: this.evCreateUser.bind(this),
+    DELETE_USER: this.evDeleteUser.bind(this),
     MUTATE_USER_CREDIT: this.evMutateUserCredit.bind(this),
   };
 
@@ -88,6 +90,14 @@ export class UserQuery implements BeforeApplicationShutdown {
   private evCreateUser(ev: CreateUserEvent): void {
     const user = plainToClass(User, ev.body);
     this.db.insert(user);
+  }
+
+  /**
+   * Fired when a user is delete
+   * @param ev Event
+   */
+  private evDeleteUser(ev: DeleteUserEvent): void {
+    this.db.delete(ev.body.userId);
   }
 
   /**

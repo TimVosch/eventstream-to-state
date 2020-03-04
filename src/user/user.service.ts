@@ -23,6 +23,10 @@ export class UserService {
     return user;
   }
 
+  async deleteUser(userId: string): Promise<BaseEvent> {
+    return this.command.delete(userId);
+  }
+
   /**
    * Get a user by its id
    * @param id The id of the user
