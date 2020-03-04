@@ -1,0 +1,23 @@
+version: '3.7'
+
+services:
+  zookeeper:
+    image: wurstmeister/zookeeper
+  # Kafka, message broker
+  kafka:
+    depends_on: ['zookeeper']
+    image: wurstmeister/kafka
+    ports:
+      - '9092:9092'
+    expose:
+      - '9093'
+    environment:
+      KAFKA_ADVERTISED_LISTENERS: INSIDE://127.0.0.1:9093,OUTSIDE://127.0.0.1:9092
+      KAFKA_LISTENER_SECURITY_PROTOCOL_MAP: INSIDE:PLAINTEXT,OUTSIDE:PLAINTEXT
+      KAFKA_INTER_BROKER_LISTENER_NAME: INSIDE
+      KAFKA_LISTENERS: INSIDE://:9093,OUTSIDE://:9092
+      KAFKA_ZOOKEEPER_CONNECT: zookeeper:2181
+      KAFKA_ADVERTISED_HOST_NAME: 127.0.0.1
+      KAFKA_BROKER_ID: 1000
+    volumes:
+      - /var/run/docker.sock:/var/run/docker.sock
