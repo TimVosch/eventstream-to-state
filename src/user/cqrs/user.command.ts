@@ -8,6 +8,7 @@ import { Kafka, Producer } from 'kafkajs';
 import { CreateUserEvent } from '../events/userCreated.event';
 import { User } from '../entities/user.entity';
 import { BaseEvent } from 'src/events/base.event';
+import { MutateUserCreditEvent } from '../events/mutateUserCredit.event';
 
 @Injectable()
 export class UserCommand implements BeforeApplicationShutdown {
@@ -36,11 +37,23 @@ export class UserCommand implements BeforeApplicationShutdown {
   }
 
   /**
-   *
+   * Create a new user
    */
   async create(user: User): Promise<CreateUserEvent> {
     // Commit to event log
     const event = new CreateUserEvent(user);
+    await this.sendEvent(event);
+    return event;
+  }
+
+  /**
+   * Mutate a user's credit
+   */
+  async mutateCredit(
+    userId: string,
+    amount: number,
+  ): Promise<MutateUserCreditEvent> {
+    const event = new MutateUserCreditEvent(userId, amount);
     await this.sendEvent(event);
     return event;
   }

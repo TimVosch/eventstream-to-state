@@ -8,6 +8,7 @@ import {
   Body,
   Param,
   NotFoundException,
+  BadRequestException,
 } from '@nestjs/common';
 import { User } from './entities/user.entity';
 import { CreateUserDTO } from './dto/createUser.dto';
@@ -27,13 +28,20 @@ export class UserController {
   }
 
   @Post('/')
-  createUser(@Body() dto: CreateUserDTO): Promise<User> {
+  createUser(@Body() dto: CreateUserDTO) {
     return this.service.createUser(dto);
   }
 
-  @Patch('/')
-  updateUser(): User {
-    throw new NotImplementedException();
+  @Post('/:id/credit')
+  async mutateCredit(@Param('id') id: string, @Body() body: any) {
+    const user = await this.getUser(id);
+
+    // Mutation must be numeric
+    if (typeof body.amount !== 'number') {
+      return new BadRequestException();
+    }
+
+    return this.service.mutateCredit(user.id, body.amount);
   }
 
   @Delete('/:id')
