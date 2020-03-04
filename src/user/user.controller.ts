@@ -1,16 +1,13 @@
 import {
   Controller,
   Get,
-  NotImplementedException,
   Post,
-  Patch,
   Delete,
   Body,
   Param,
   NotFoundException,
   BadRequestException,
 } from '@nestjs/common';
-import { User } from './entities/user.entity';
 import { CreateUserDTO } from './dto/createUser.dto';
 import { UserService } from './user.service';
 
