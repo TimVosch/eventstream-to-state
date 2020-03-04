@@ -6,6 +6,8 @@ import {
   Patch,
   Delete,
   Body,
+  Param,
+  NotFoundException,
 } from '@nestjs/common';
 import { User } from './entities/user.entity';
 import { CreateUserDTO } from './dto/createUser.dto';
@@ -16,8 +18,12 @@ export class UserController {
   constructor(private readonly service: UserService) {}
 
   @Get('/:id')
-  getUser(): User {
-    throw new NotImplementedException();
+  async getUser(@Param('id') id: string) {
+    const user = await this.service.getUser(id);
+    if (!user) {
+      throw new NotFoundException();
+    }
+    return user;
   }
 
   @Post('/')

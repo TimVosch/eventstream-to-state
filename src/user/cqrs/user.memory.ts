@@ -25,7 +25,7 @@ export class UserMemory {
     }
 
     // If id is already used
-    if (typeof this.users[user.id] !== undefined) {
+    if (this.users[user.id] !== undefined) {
       throw new DuplicateKeyError('A user with given ID already exists');
     }
 
@@ -44,7 +44,7 @@ export class UserMemory {
   update(user: User): User {
     // Cannot update a user that does not exist
     if (this.get(user.id) === null) {
-      throw new NotFoundError(`Cannot find user ${id}`);
+      throw new NotFoundError(`Cannot find user ${user.id}`);
     }
 
     // Update

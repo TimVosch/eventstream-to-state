@@ -73,6 +73,12 @@ export class UserQuery implements BeforeApplicationShutdown {
     processor(ev);
   }
 
+  //
+  // ====================================
+  //  Event processors
+  // ====================================
+  //
+
   /**
    * Fired when a new user is created
    * @param ev Event
@@ -81,6 +87,12 @@ export class UserQuery implements BeforeApplicationShutdown {
     const user = plainToClass(User, ev.body);
     this.db.insert(user);
   }
+
+  //
+  // ====================================
+  //  Public methods
+  // ====================================
+  //
 
   /**
    * Get a user by its id
