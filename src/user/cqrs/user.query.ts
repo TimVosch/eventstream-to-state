@@ -6,9 +6,11 @@ import {
 } from '@nestjs/common';
 import { Kafka, Consumer, EachMessagePayload } from 'kafkajs';
 import { v4 as uuid } from 'uuid';
+import { plainToClass } from 'class-transformer';
 import { CreateUserEvent } from '../events/userCreated.event';
 import { User } from '../entities/user.entity';
 import { BaseEvent } from 'src/events/base.event';
+import { UserMemory } from './user.memory';
 
 @Injectable()
 export class UserQuery implements BeforeApplicationShutdown {
@@ -19,10 +21,10 @@ export class UserQuery implements BeforeApplicationShutdown {
     CREATE_USER: this.evCreateUser.bind(this),
   };
 
-  private readonly TOPIC = 'userEvents';
+  private readonly TOPIC = 'USER_EVENTS';
   private readonly consumer: Consumer;
 
-  constructor(@Inject('KAFKA') kafka: Kafka) {
+  constructor(@Inject('KAFKA') kafka: Kafka, private readonly db: UserMemory) {
     this.consumer = kafka.consumer({
       groupId: uuid(),
     });
@@ -61,17 +63,30 @@ export class UserQuery implements BeforeApplicationShutdown {
   private processMessage(payload: EachMessagePayload): void {
     const { message } = payload;
     const ev = JSON.parse(message.value.toString()) as BaseEvent;
-    Logger.log(`Processing EV: ${ev.type}`);
+    Logger.log(`Processing EV: ${ev.type}`, 'UserQuery');
 
     const processor = this.EVENT_FUNC_MAP[ev.type];
     if (!processor) {
-      Logger.error(`No processor found for EV: ${ev.type}`);
+      Logger.error(`No processor found for EV: ${ev.type}`, 'UserQuery');
       return;
     }
     processor(ev);
   }
 
+  /**
+   * Fired when a new user is created
+   * @param ev Event
+   */
   private evCreateUser(ev: CreateUserEvent): void {
-    Logger.log('Creating user...');
+    const user = plainToClass(User, ev.body);
+    this.db.insert(user);
+  }
+
+  /**
+   * Get a user by its id
+   * @param id The id of the user
+   */
+  get(id: string): User {
+    return this.db.get(id);
   }
 }
