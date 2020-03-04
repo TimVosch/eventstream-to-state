@@ -2,12 +2,16 @@ import { Injectable } from '@nestjs/common';
 import { User } from './entities/user.entity';
 import { v4 as uuid } from 'uuid';
 import { CreateUserDTO } from './dto/createUser.dto';
-import { UserSource } from './cqrs/user.source';
 import { BaseEvent } from 'src/events/base.event';
+import { UserQuery } from './cqrs/user.query';
+import { UserCommand } from './cqrs/user.command';
 
 @Injectable()
 export class UserService {
-  constructor(private readonly source: UserSource) {}
+  constructor(
+    private readonly query: UserQuery,
+    private readonly command: UserCommand,
+  ) {}
 
   /**
    * Create a new user
@@ -15,7 +19,7 @@ export class UserService {
    */
   async createUser(dto: CreateUserDTO): Promise<User> {
     const user = new User(uuid(), dto.username, dto.bio, 100);
-    await this.source.create(user);
+    await this.command.create(user);
     return user;
   }
 
@@ -24,7 +28,7 @@ export class UserService {
    * @param id The id of the user
    */
   async getUser(id: string): Promise<User> {
-    return this.source.get(id);
+    return this.query.get(id);
   }
 
   /**
@@ -33,6 +37,6 @@ export class UserService {
    * @param amount The mutation amount
    */
   async mutateCredit(userId: string, amount: number): Promise<BaseEvent> {
-    return this.source.mutateCredit(userId, amount);
+    return this.command.mutateCredit(userId, amount);
   }
 }
