@@ -7,7 +7,7 @@ import {
 import { Kafka, Consumer, EachMessagePayload } from 'kafkajs';
 import { v4 as uuid } from 'uuid';
 import { plainToClass } from 'class-transformer';
-import { CreateUserEvent } from '../events/userCreated.event';
+import { CreateUserEvent } from '../events/createUser.event';
 import { User } from '../entities/user.entity';
 import { BaseEvent } from 'src/events/base.event';
 import { UserMemory } from './user.memory';

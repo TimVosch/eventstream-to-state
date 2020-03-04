@@ -5,7 +5,7 @@ import {
   Logger,
 } from '@nestjs/common';
 import { Kafka, Producer } from 'kafkajs';
-import { CreateUserEvent } from '../events/userCreated.event';
+import { CreateUserEvent } from '../events/createUser.event';
 import { User } from '../entities/user.entity';
 import { BaseEvent } from 'src/events/base.event';
 import { MutateUserCreditEvent } from '../events/mutateUserCredit.event';

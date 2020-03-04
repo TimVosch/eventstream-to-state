@@ -3,7 +3,7 @@ import { UserQuery } from './user.query';
 import { UserCommand } from './user.command';
 import { User } from '../entities/user.entity';
 import { MutateUserCreditEvent } from '../events/mutateUserCredit.event';
-import { CreateUserEvent } from '../events/userCreated.event';
+import { CreateUserEvent } from '../events/createUser.event';
 
 @Injectable()
 export class UserSource {
