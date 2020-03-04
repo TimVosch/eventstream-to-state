@@ -60,10 +60,14 @@ Body:
 }
 ```
 
-### Delete a user
+#### Delete a user
 
 URL:
 
 ```
 DELETE http://localhost:3000/users/<id>
 ```
+
+## Synchronization between multiple instances
+
+![](https://github.com/adam-p/markdown-here/raw/master/docs/eventsourcing_delay.png)
